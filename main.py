@@ -93,9 +93,11 @@ def main_selenium():
 
             hour = int(elapsed_time / 3600)
             minute = max(0, int(elapsed_time / 60) % 60)
-            rmpt, rmpu = removals/(max(elapsed_time/60, 1)), 'm'
+            rmpt, rmpu = removals/(max(elapsed_time, 1)), 's'
             if rmpt > 0 and rmpt < 1:
-                rmpt, rmpu = removals/elapsed_time, 's'
+                rmpt, rmpu = removals/max(elapsed_time/60, 1), 'm'
+            if rmpt > 0 and rmpt < 1:
+                rmpt, rmpu = removals/max(elapsed_time/3600, 1), 'h'
 
             logger.info(f"{loops}th loop. elapsed {hour}h {minute}m. {removals} removed. ({rmpt:.1f}/{rmpu})")
             logger.info("게시글 목록을 불러오는 중")
