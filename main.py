@@ -35,22 +35,6 @@ def main_selenium():
     driver = Chrome(options=options)
     driver.implicitly_wait(10)
 
-    def task_check_driver_alive():
-        nonlocal driver
-
-        time.sleep(5)
-        while True:
-            try:
-                driver.title
-                time.sleep(1)
-            except:
-                break
-
-        events['reload'].set()
-        events['exit'].set()
-
-    Thread(target=task_check_driver_alive, daemon=True).start()
-
     try:
         gall_id = get_config().get('gallery', 'id')
         gall_url = urlparse(f"https://gall.dcinside.com/mgallery/board/lists?id={gall_id}")
@@ -169,6 +153,7 @@ def main_selenium():
                 else:
                     logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")
                     da.accept()
+                interval_human()
             except Exception as e:
                 logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
                 continue
