@@ -1,0 +1,13 @@
+# python
+__pycache__
+venv
+
+# private config
+config.ini
+
+# vscode
+.vscode
+
+# log
+.log
+*.log

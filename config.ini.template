@@ -1,0 +1,43 @@
+[log]
+; INFO, DEBUG, WARNING, ERROR, CRITICAL
+level=INFO
+path=.log
+name=
+; k=kb, m=mb, g=gb
+max_size=10m
+backups=5
+
+[user]
+uid=아이디
+pwd=비밀번호
+
+[gallery]
+; 마갤 id
+id=
+; 삭제할 ip 목록, 콤마로 구분
+ip_blacklist=
+; 차단 시간. no_mercy=True일 경우 무시됨 1 or 6
+block_hour=6
+; True일 경우 가장 긴 차단을 시도, False일 경우 block_hour
+no_mercy=True
+
+[selenium]
+headless=false
+
+; 새로고침 간격, 단위(sec)
+[interval.refresh]
+; 최소값
+min=30
+; 최대값
+max=300
+; 게시글 없을때 새로고침 주기 증가율 (ex 1.5=1.5배씩)
+mul=1.05
+; 랜덤값 크기 (min=30, rand=30 -> 30~60초)
+rand=30
+
+; 클릭간 랜덤 지연, 단위(ms)
+[interval.click]
+; 최소값
+min=600
+; 최대값
+max=1000
