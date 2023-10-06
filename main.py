@@ -27,7 +27,7 @@ def main_selenium():
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
     options.add_argument("--disable-blink-features=AutomationControlled")
-    if get_config().getboolean('selenium', 'headless'):
+    if get_config().getboolean('selenium', 'headless', fallback=False):
         options.add_argument("--window-size=1920,1080")
         options.add_argument("--start-maximized")
         options.add_argument("--headless")
@@ -59,7 +59,7 @@ def main_selenium():
         gall_url = urlparse(f"https://gall.dcinside.com/mgallery/board/lists?id={gall_id}")
 
         loops = 0
-        interval = get_config().getfloat('interval.refresh', 'min')
+        interval = get_config().getfloat('interval.refresh', 'min', 30)
         removals = 0
         last_time = time.time()
         elapsed_time = 2e-20
@@ -123,15 +123,15 @@ def main_selenium():
             posts = list(posts)
 
             if len(posts) == 0:
-                rand_size = get_config().getfloat('interval.refresh', 'rand')
+                rand_size = get_config().getfloat('interval.refresh', 'rand', fallback=30)
                 interval = random() * rand_size + interval
-                interval = interval * get_config().getfloat('interval.refresh', 'mul')
-                interval = min(interval, get_config().getint('interval.refresh', 'max'))
+                interval = interval * get_config().getfloat('interval.refresh', 'mul', fallback=1.5)
+                interval = min(interval, get_config().getint('interval.refresh', 'max', fallback=600))
                 logger.info(f"삭제할 게시글이 없음. {interval:.2f}s 대기...")
                 events['reload'].wait(interval)
                 continue
             else:
-                interval = get_config().getfloat('interval.refresh', 'min')
+                interval = get_config().getfloat('interval.refresh', 'min', fallback=30)
 
             logger.info(f"삭제할 게시글 수 : {len(posts)}")
             for post in posts:
@@ -142,10 +142,10 @@ def main_selenium():
             driver.find_element(By.CSS_SELECTOR, 'div.useradmin_btnbox > button:nth-child(3)').click()
             interval_human()
 
-            if get_config().getboolean('gallery', 'no_mercy'):
+            if get_config().getboolean('gallery', 'no_mercy', fallback=False):
                 hour_btn = driver.find_elements(By.CSS_SELECTOR, '.block_sel.time > span > input:not(.disabled)')[-1]
             else:
-                hour_btn = driver.find_element(By.CSS_SELECTOR, f'#avoid_pop_avoid_hour{get_config().getint("gallery", "block_hour")}')
+                hour_btn = driver.find_element(By.CSS_SELECTOR, f'#avoid_pop_avoid_hour{get_config().getint("gallery", "block_hour", fallback=6)}')
             block_hour = int(hour_btn.get_attribute('value'))
             hour_btn.click()
             interval_human()

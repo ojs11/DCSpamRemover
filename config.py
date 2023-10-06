@@ -1,7 +1,6 @@
-import configparser
 import os
 import time
-
+from configparser import ConfigParser
 from logging import getLogger
 
 from watchdog.events import FileModifiedEvent, FileSystemEventHandler
@@ -10,28 +9,31 @@ from watchdog.observers import Observer
 logger = getLogger()
 
 
-class Config:
+def parse_size(size):
+    size = size.upper().replace(' ', '')
+    if size.endswith('G'):
+        return int(size[:-1]) * 1024 * 1024 * 1024
+    elif size.endswith('M'):
+        return int(size[:-1]) * 1024 * 1024
+    elif size.endswith('K'):
+        return int(size[:-1]) * 1024
+    else:
+        return int(size)
+
+
+class Config(ConfigParser):
     def __init__(self, filename):
-        self._raw = configparser.ConfigParser()
-        self._raw.read(filename, encoding='utf-8')
+        super().__init__()
+        self.read(filename, encoding='utf-8')
 
-    def get(self, *args, **kwargs):
-        return self._raw.get(*args, **kwargs)
+    def getByteSize(self, section: str, option: str, *, raw=False, vars=None, fallback=0):
+        return parse_size(self.get(section, option, raw=raw, vars=vars, fallback=fallback))
 
-    def getUpper(self, *args, **kwargs):
-        return self._raw.get(*args, **kwargs).upper()
+    def getUpper(self, section: str, option: str, *, raw=False, vars=None, fallback=None):
+        return self.get(section, option, raw=raw, vars=vars, fallback=fallback)
 
-    def getint(self, *args, **kwargs):
-        return self._raw.getint(*args, **kwargs)
-
-    def getboolean(self, *args, **kwargs):
-        return self._raw.getboolean(*args, **kwargs)
-
-    def getfloat(self, *args, **kwargs):
-        return self._raw.getfloat(*args, **kwargs)
-
-    def getlist(self, *args, **kwargs):
-        return [x.strip() for x in self._raw.get(*args, **kwargs).split(",")]
+    def getlist(self, section: str, option: str, *, raw=False, vars=None, fallback: list = []):
+        return self.get(section, option, raw=raw, vars=vars, fallback=fallback).split(',')
 
 
 class FileChangeHandler(FileSystemEventHandler):
