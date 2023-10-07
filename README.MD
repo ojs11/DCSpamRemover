@@ -4,3 +4,11 @@
 
 나도 갤질하면서 이런게 필요할 줄 몰랐지...
 아이피 대역 차단은 대체 어떻게 뚫는거냐고
+
+
+## Virus 감지되는데요?
+[Refernce](https://nitratine.net/blog/post/issues-when-using-auto-py-to-exe/#my-antivirus-detected-the-exe-as-a-virus)
+
+pyinstaller 오진이라고 합니다.
+
+Virus 감지되는게 마음에 안들면 python 코드를 직접 돌리면 됨.
