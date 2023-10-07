@@ -7,7 +7,6 @@ from urllib.parse import urlparse, urlunparse
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoAlertPresentException
 
 import dc
 from config import get_config
@@ -35,24 +34,6 @@ def main_selenium():
 
     driver = Chrome(options=options)
     driver.implicitly_wait(10)
-
-    def task_check_driver_alive():
-        nonlocal driver
-
-        time.sleep(5)
-        while True:
-            try:
-                driver.switch_to.alert.text
-                time.sleep(1)
-            except NoAlertPresentException:
-                pass
-            except Exception:
-                break
-
-        events['reload'].set()
-        events['exit'].set()
-
-    Thread(target=task_check_driver_alive, daemon=True).start()
 
     try:
         gall_id = get_config().get('gallery', 'id')
