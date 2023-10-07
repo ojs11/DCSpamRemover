@@ -24,7 +24,7 @@ events = {
 def main_selenium():
     options = ChromeOptions()
     options.add_argument("--ignore-certificate-errors")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
     options.add_experimental_option('useAutomationExtension', False)
     options.add_argument("--disable-blink-features=AutomationControlled")
     if get_config().getboolean('selenium', 'headless', fallback=False):
