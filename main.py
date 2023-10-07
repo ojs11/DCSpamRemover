@@ -1,3 +1,4 @@
+import atexit
 import time
 from logging import getLogger
 from random import random
@@ -34,6 +35,7 @@ def main_selenium():
 
     driver = Chrome(options=options)
     driver.implicitly_wait(10)
+    atexit.register(lambda: driver.close())
 
     try:
         gall_id = get_config().get('gallery', 'id')
