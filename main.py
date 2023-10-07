@@ -59,7 +59,7 @@ def main_selenium():
         gall_url = urlparse(f"https://gall.dcinside.com/mgallery/board/lists?id={gall_id}")
 
         loops = 0
-        interval = get_config().getfloat('interval.refresh', 'min', 30)
+        interval = get_config().getfloat('interval.refresh', 'min', fallback=30)
         removals = 0
         last_time = time.time()
         elapsed_time = 2e-20
