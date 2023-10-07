@@ -71,9 +71,7 @@ def main_selenium():
                 break
 
             loops += 1
-
-            if events['exit'].is_set():
-                events['reload'].clear()
+            events['reload'].clear()
 
             curr_url = urlparse(driver.current_url)
             if curr_url.path != gall_url.path:
