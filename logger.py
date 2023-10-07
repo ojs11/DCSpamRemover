@@ -8,13 +8,14 @@ from config import get_config
 
 
 def setup_logger():
-    log_path = get_config().get('log', 'path')
-    log_name = (get_config().get('log', 'name') or time.strftime("%Y-%m-%d")) + ".log"
-    log_size = get_config().getByteSize('log', 'max_size')
-    log_backups = get_config().getint('log', 'backups')
-    log_path = pathlib.Path.joinpath(pathlib.Path(log_path), log_name)
+    log_path = get_config().get('log', 'path', fallback=".log")
+    log_name = get_config().get('log', 'name', fallback='') or time.strftime("%Y-%m-%d")
+    log_size = get_config().getByteSize('log', 'max_size', fallback="1MB")
+    log_backups = get_config().getint('log', 'backups', fallback=3)
+    log_path = pathlib.Path(log_path).joinpath(log_name+".log")
 
-    os.makedirs(log_path.parent, exist_ok=True)
+    if not os.path.exists(log_path.parent):
+        os.makedirs(log_path.parent, exist_ok=True)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -26,6 +27,6 @@ def setup_logger():
 
     logger = logging.getLogger()
     logger.name = 'DCSpamRemover'
-    logger.setLevel(logging.getLevelName(get_config().getUpper('log', 'level')))
+    logger.setLevel(get_config().getUpper('log', 'level', fallback="INFO"))
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
