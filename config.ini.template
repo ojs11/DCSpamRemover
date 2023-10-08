@@ -16,6 +16,8 @@ pwd=비밀번호
 id=
 ; 삭제할 ip 목록, 콤마로 구분
 ip_blacklist=
+; 삭제할 게시글 타입 목록. * = 전부, 자세한건 README.MD 참조 (default=*)
+ptypes_to_remove=*
 ; 차단 시간. no_mercy=True일 경우 무시됨 1 or 6
 block_hour=6
 ; True일 경우 가장 긴 차단을 시도, False일 경우 block_hour

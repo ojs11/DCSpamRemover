@@ -99,10 +99,15 @@ def main_selenium():
                 last_time = time.time()
                 continue
 
+            ptypes_to_remove = get_config().getlist('gallery', 'ptypes_to_remove', fallback=['*'], fallback_on_empty=True)
+
             posts = driver.find_elements(By.CSS_SELECTOR, 'tr.us-post[data-no]')
             posts = map(lambda p: dc.DCPostTR(p), posts)
             posts = filter(lambda p: p.writer_uid is None, posts)
             posts = filter(lambda p: p.writer_ip in get_config().getlist('gallery', 'ip_blacklist'), posts)
+            posts = filter(lambda p: p.post_type != "icon_notice", posts)
+            if ptypes_to_remove != ['*']:
+                posts = filter(lambda p: p.post_type in ptypes_to_remove, posts)
             posts = list(posts)
 
             if len(posts) == 0:
@@ -150,7 +155,7 @@ def main_selenium():
                 elif da.text == "차단 및 삭제되었습니다.":
                     da.accept()
                     for post in posts:
-                        logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
+                        logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
                     removals += len(posts)
                 else:
                     logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")

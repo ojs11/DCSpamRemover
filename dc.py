@@ -121,6 +121,25 @@ class DCPostTR:
         except:
             return None
 
+    @cached_property
+    def post_type(self):
+        """
+            Type of post
+
+            1. icon_notice   : 공지글
+            2. icon_txt      : 일반글
+            3. icon_pic      : 이미지 첨부글
+            4. icon_movie    : 동영상 첨부글
+            5. icon_ai       : AI 이미지
+            6. icon_recomimg : 개념글
+
+            None if error
+        """
+        try:
+            return self._elem.get_attribute("data-type")
+        except:
+            return None
+
     def click(self):
         try:
             self._elem.find_element(By.CSS_SELECTOR, 'a').click()

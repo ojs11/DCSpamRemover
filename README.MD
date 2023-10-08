@@ -12,3 +12,16 @@
 pyinstaller 오진이라고 합니다.
 
 Virus 감지되는게 마음에 안들면 python 코드를 직접 돌리면 됨.
+
+
+## Type of Post
+작성자ㅏ 모든 유형을 다 알진 못하니, 필요하면 개발자 도구 켜서 확인할것
+
+공지(icon_notice)는 항상 제외됨
+```
+1. icon_txt      : 일반글
+2. icon_pic      : 이미지 첨부글
+3. icon_movie    : 동영상 첨부글
+4. icon_ai       : AI 이미지
+5. icon_recomimg : 개념글
+```
