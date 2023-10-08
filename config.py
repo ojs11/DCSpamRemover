@@ -32,8 +32,11 @@ class Config(ConfigParser):
     def getUpper(self, section: str, option: str, *, raw=False, vars=None, fallback=None):
         return self.get(section, option, raw=raw, vars=vars, fallback=fallback)
 
-    def getlist(self, section: str, option: str, *, raw=False, vars=None, fallback: list = []):
-        return self.get(section, option, raw=raw, vars=vars, fallback=fallback).split(',')
+    def getlist(self, section: str, option: str, *, raw=False, vars=None, fallback: list = [], fallback_on_empty=False):
+        v = self.get(section, option, raw=raw, vars=vars, fallback=fallback)
+        if v == '' and fallback_on_empty:
+            return fallback
+        return v.split(',')
 
 
 class FileChangeHandler(FileSystemEventHandler):
