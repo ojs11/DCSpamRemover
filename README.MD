@@ -25,3 +25,9 @@ Virus 감지되는게 마음에 안들면 python 코드를 직접 돌리면 됨.
 4. icon_ai       : AI 이미지
 5. icon_recomimg : 개념글
 ```
+
+
+## For mobile
+Wiki 브라우저로 개발자 도구 사용 가능. `mobile.js` 복붙해서 실행하면 됨
+
+js로 알림 처리가 불가능해서 반복은 못함
