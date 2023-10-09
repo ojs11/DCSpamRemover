@@ -31,11 +31,15 @@ function parseCookies() {
     var cookieArray = cookieString.split(";");
 
     for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = cookieArray[i].trim();
-        var separatorIndex = cookie.indexOf("=");
-        var cookieName = decodeURIComponent(cookie.substring(0, separatorIndex));
-        var cookieValue = decodeURIComponent(cookie.substring(separatorIndex + 1));
-        cookies[cookieName] = cookieValue;
+        try {
+            var cookie = cookieArray[i].trim();
+            var separatorIndex = cookie.indexOf("=");
+            var cookieName = decodeURIComponent(cookie.substring(0, separatorIndex));
+            var cookieValue = decodeURIComponent(cookie.substring(separatorIndex + 1));
+            cookies[cookieName] = cookieValue;
+        } catch (e) {
+            // pass, don't care   
+        }
     }
 
     return cookies;
