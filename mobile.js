@@ -28,6 +28,7 @@ function block_and_del_posts(posts) {
     $("div.useradmin_btnbox > button:nth-child(3)").click()
     $("#avoid_pop_avoid_hour6").click()
     $("#avoid_pop_avoid_reason_4").click()
+    $("#avoid_pop_avoid_del").click()
     $("#avoid_pop > div > div.btn_box > button").click()
 }
 
