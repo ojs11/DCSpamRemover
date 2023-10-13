@@ -161,43 +161,60 @@ def main_selenium():
                 dc.DCPostTR(driver.find_element(By.CSS_SELECTOR, f'tr.ub-content[data-no="{post.postId}"]')).click_checkbox()
                 interval_human()
 
-            driver.find_element(By.CSS_SELECTOR, 'div.useradmin_btnbox > button:nth-child(3)').click()
-            interval_human()
+            if get_config().getboolean('gallery', 'block_and_del=', fallback=True):
+                driver.find_element(By.CSS_SELECTOR, 'div.useradmin_btnbox > button:nth-child(3)').click()
+                interval_human()
 
-            if get_config().getboolean('gallery', 'no_mercy', fallback=False):
-                hour_btn = driver.find_elements(By.CSS_SELECTOR, '.block_sel.time > span > input:not(.disabled)')[-1]
+                if get_config().getboolean('gallery', 'no_mercy', fallback=False):
+                    hour_btn = driver.find_elements(By.CSS_SELECTOR, '.block_sel.time > span > input:not(.disabled)')[-1]
+                else:
+                    hour_btn = driver.find_element(By.CSS_SELECTOR, f'#avoid_pop_avoid_hour{get_config().getint("gallery", "block_hour", fallback=6)}')
+                block_hour = int(hour_btn.get_attribute('value'))
+                hour_btn.click()
+                interval_human()
+
+                driver.find_element(By.CSS_SELECTOR, '#avoid_pop_avoid_reason_4').click()  # 도배
+                interval_human()
+                driver.find_element(By.CSS_SELECTOR, '#avoid_pop_avoid_del').click()  # 차단 및 삭제
+                interval_human()
+
+                driver.find_element(By.CSS_SELECTOR, '#avoid_pop > div > div.btn_box > button').click()
+                interval_human()
+
+                try:
+                    da = driver.switch_to.alert
+                    if da.text == "시스템 오류로 작업이 중지되었습니다. 잠시 후 다시 이용해 주세요.":
+                        logger.info("이미 삭제되었습니다.")
+                        da.accept()
+                    elif da.text == "차단 및 삭제되었습니다.":
+                        da.accept()
+                        for post in posts:
+                            logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
+                        removals += len(posts)
+                    else:
+                        logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")
+                        da.accept()
+                    interval_human()
+                except Exception as e:
+                    logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
+                    continue
             else:
-                hour_btn = driver.find_element(By.CSS_SELECTOR, f'#avoid_pop_avoid_hour{get_config().getint("gallery", "block_hour", fallback=6)}')
-            block_hour = int(hour_btn.get_attribute('value'))
-            hour_btn.click()
-            interval_human()
-
-            driver.find_element(By.CSS_SELECTOR, '#avoid_pop_avoid_reason_4').click()  # 도배
-            interval_human()
-
-            driver.find_element(By.CSS_SELECTOR, '#avoid_pop_avoid_del').click()  # 차단 및 삭제
-            interval_human()
-
-            driver.find_element(By.CSS_SELECTOR, '#avoid_pop > div > div.btn_box > button').click()
-            interval_human()
-
-            try:
-                da = driver.switch_to.alert
-                if da.text == "시스템 오류로 작업이 중지되었습니다. 잠시 후 다시 이용해 주세요.":
-                    logger.info("이미 삭제되었습니다.")
+                driver.find_element(By.CSS_SELECTOR, 'div.useradmin_btnbox > button:nth-child(2)').click()
+                interval_human()
+                try:
+                    da = driver.switch_to.alert
                     da.accept()
-                elif da.text == "차단 및 삭제되었습니다.":
+                    interval_human()
+                    if da.text != "삭제되었습니다.":
+                        logger.info(f"이미 삭제되었습니다.")
+                        da.accept()
+                        continue
                     da.accept()
                     for post in posts:
-                        logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
-                    removals += len(posts)
-                else:
-                    logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")
-                    da.accept()
-                interval_human()
-            except Exception as e:
-                logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
-                continue
+                        logger.info(f"삭제 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
+                except Exception as e:
+                    logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
+                    continue
 
             end_time = time.time()
             elapsed_time += end_time - last_time
