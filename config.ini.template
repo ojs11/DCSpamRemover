@@ -23,6 +23,12 @@ block_hour=6
 ; True일 경우 가장 긴 차단을 시도, False일 경우 block_hour
 no_mercy=True
 
+; 유동 탄압. false/proxy/mobile/proxy,mobile
+restrict_anonymous=false
+
+; 이미지, 동영상 첨부 제한. false/all/proxy/mobile/proxy,mobile
+restrict_media=false
+
 [selenium]
 headless=false
 

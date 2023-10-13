@@ -1,4 +1,5 @@
 import atexit
+from datetime import datetime
 import time
 from logging import getLogger
 from random import random
@@ -19,6 +20,16 @@ events = {
     'reload': Event(),
     'exit': Event()
 }
+
+
+def should_renew_restrict(last_restrict_dt: list[datetime]):
+    now = datetime.now()
+    for dt in last_restrict_dt:
+        if dt is None:
+            continue
+        if (dt - now).total_seconds() <= 600:
+            return True
+    return False
 
 
 def main_selenium():
@@ -46,6 +57,7 @@ def main_selenium():
         removals = 0
         last_time = time.time()
         elapsed_time = 2e-20
+        last_restrict_dt = None
         while driver and not events['exit'].is_set():
             try:
                 driver.title
@@ -92,6 +104,28 @@ def main_selenium():
                 driver.refresh()
                 last_time = time.time()
                 continue
+
+            restrict_anonymous = get_config().getListOrFalse('gallery', 'restrict_anonymous')
+            restrict_media = get_config().getListOrFalse('gallery', 'restrict_media')
+            if restrict_anonymous or restrict_media:
+                if not last_restrict_dt or should_renew_restrict(last_restrict_dt):
+                    logger.info("유동 탄입 및 미디어 차단 설정...")
+                    last_restrict_dt = dc.restrict_anonymous(
+                        driver,
+                        gall_id,
+                        'proxy' in restrict_anonymous,
+                        'mobile' in restrict_anonymous,
+                        'media' in restrict_media,
+                        'proxy' in restrict_media,
+                        'all' in restrict_media,
+                    )
+                    if last_restrict_dt[0]:
+                        logger.info("   VPN 제한: " + last_restrict_dt[0].strftime("%Y-%m-%d %H:%M:%S"))
+                    if last_restrict_dt[1]:
+                        logger.info("모바일 제한: " + last_restrict_dt[1].strftime("%Y-%m-%d %H:%M:%S"))
+                    if last_restrict_dt[2]:
+                        logger.info("미디어 제한: " + last_restrict_dt[2].strftime("%Y-%m-%d %H:%M:%S"))
+                    driver.get(urlunparse(gall_url))
 
             if dc.is_del_limit_exceeded(driver):
                 logger.info("일일 삭제 횟수 제한이 초과 되었습니다. 6시간 후 재시도")

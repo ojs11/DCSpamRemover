@@ -38,6 +38,12 @@ class Config(ConfigParser):
             return fallback
         return v.split(',')
 
+    def getListOrFalse(self, section: str, option: str) -> bool | list[str]:
+        v = self.get(section, option, fallback=False)
+        if not v:
+            return []
+        return v.split(",")
+
 
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self):

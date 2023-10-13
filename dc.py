@@ -6,6 +6,13 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from interval import interval_human
 
+import utils
+
+
+def _click(elem):
+    elem.click()
+    interval_human()
+
 
 def login(driver: WebDriver, gall_id: str, uid, pwd):
     driver.get(f"https://sign.dcinside.com/login?s_url=https%3A%2F%2Fgall.dcinside.com%2Fmgallery%2Fboard%2Flists%3Fid%3D{gall_id}&s_key=32")
@@ -62,6 +69,66 @@ def is_user_admin(driver: WebDriver):
         return True
     except:
         return False
+
+
+def restrict_anonymous(
+    driver: WebDriver,
+    gall_id: str,
+    restrcit_gall_proxy: bool,
+    restrict_gall_mobile: bool,
+    restrict_media_proxy: bool,
+    restrict_media_mobile: bool,
+    restrict_media_all: bool,
+):
+    url = f"https://gall.dcinside.com/mgallery/management/gallery?id={gall_id}"
+    if driver.current_url != url:
+        driver.get(url)
+
+    btn = driver.find_element(By.CSS_SELECTOR, ".nonmember > div:nth-child(2) > div:nth-child(2) > button:nth-child(1)")
+    if (btn.is_displayed()):
+        _click(btn)
+
+    if restrcit_gall_proxy:
+        div = driver.find_element(By.CSS_SELECTOR, "div.cont_inr.set.proxy")
+        ab = div.find_element(By.CSS_SELECTOR, 'div.select_box')
+        _click(ab)
+        _click(ab.find_element(By.CSS_SELECTOR, 'ul > li:last-child'))
+        _click(div.find_element(By.CSS_SELECTOR, '.update_time'))
+
+    if restrict_gall_mobile:
+        div = driver.find_element(By.CSS_SELECTOR, "div.cont_inr.set.mobile")
+        ab = div.find_element(By.CSS_SELECTOR, 'div.select_box')
+        _click(ab)
+        _click(ab.find_element(By.CSS_SELECTOR, 'ul > li:last-child'))
+        _click(div.find_element(By.CSS_SELECTOR, '.update_time'))
+
+    if restrict_media_proxy or restrict_media_mobile or restrict_media_all:
+        div = driver.find_element(By.CSS_SELECTOR, "div.cont_inr.img_block")
+        if restrict_media_proxy:
+            _vpn = driver.find_element(By.CSS_SELECTOR, '#img_block_vpn')
+            if not _vpn.is_selected():
+                _click(_vpn)
+        if restrict_media_mobile:
+            _mobile = driver.find_element(By.CSS_SELECTOR, '#img_block_mobile')
+            if not _mobile.is_selected():
+                _click(_mobile)
+        if restrict_media_all:
+            _all = driver.find_element(By.CSS_SELECTOR, '#img_block_all')
+            if not _all.is_selected():
+                _click(_all)
+
+        ab = div.find_element(By.CSS_SELECTOR, 'div.select_box')
+        _click(ab)
+        _click(ab.find_element(By.CSS_SELECTOR, 'ul > li:last-child'))
+        _click(div.find_element(By.CSS_SELECTOR, '.update_time'))
+
+    dt_proxy = utils.extract_datetime(driver.find_element(By.CSS_SELECTOR, '.proxy_txt').text)
+    dt_mobile = utils.extract_datetime(driver.find_element(By.CSS_SELECTOR, '.mobile_txt').text)
+    dt_media = utils.extract_datetime(driver.find_element(By.CSS_SELECTOR, '.img_block_txt').text)
+
+    _click(driver.find_element(By.CSS_SELECTOR, '.nonmember .set_save'))
+
+    return (dt_proxy, dt_mobile, dt_media)
 
 
 class DCPostTR:
