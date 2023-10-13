@@ -162,7 +162,7 @@ def main_selenium():
                 dc.DCPostTR(driver.find_element(By.CSS_SELECTOR, f'tr.ub-content[data-no="{post.postId}"]')).click_checkbox()
                 interval_human()
 
-            if get_config().getboolean('gallery', 'block_and_del=', fallback=True):
+            if get_config().getboolean('gallery', 'block_and_del', fallback=True):
                 driver.find_element(By.CSS_SELECTOR, 'div.useradmin_btnbox > button:nth-child(3)').click()
                 interval_human()
 
