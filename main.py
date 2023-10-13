@@ -1,6 +1,6 @@
 import atexit
-from datetime import datetime
 import time
+from datetime import datetime
 from logging import getLogger
 from random import random
 from threading import Event, Thread
@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 
 import dc
+import ipv4
 from config import get_config
 from interval import interval_human
 
@@ -189,7 +190,7 @@ def main_selenium():
                     elif da.text == "차단 및 삭제되었습니다.":
                         da.accept()
                         for post in posts:
-                            logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
+                            logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip} 국가={ipv4.get_ip_country(post.writer_ip)}")
                         removals += len(posts)
                     else:
                         logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")
@@ -211,7 +212,7 @@ def main_selenium():
                         continue
                     da.accept()
                     for post in posts:
-                        logger.info(f"삭제 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip}")
+                        logger.info(f"삭제 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip} 국가={ipv4.get_ip_country(post.writer_ip)}")
                 except Exception as e:
                     logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
                     continue
