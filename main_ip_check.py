@@ -23,6 +23,7 @@ if __name__ == "__main__":
 
     setup_logger()
 
+    last_pid = 0
     while True:
         driver.get(urlunparse(gall_url))
 
@@ -30,6 +31,7 @@ if __name__ == "__main__":
 
         posts = driver.find_elements(By.CSS_SELECTOR, 'tr.us-post[data-no]')
         posts = map(lambda p: dc.DCPostTR(p), posts)
+        posts = filter(lambda p: p.postId > last_pid, posts)
         posts = filter(lambda p: p.writer_uid is None, posts)
         posts = filter(lambda p: p.post_type != "icon_notice", posts)
         posts = list(posts)
@@ -43,5 +45,8 @@ if __name__ == "__main__":
                 e = ",".join(set(map(lambda i: i.name_en, ip)))
                 k = ",".join(set(map(lambda i: i.name_kr, ip)))
                 logger.info(f"pid={p.postId}, title={p.title[:3]}..., ip={p.writer_ip}, Country={c} name_en={e} name_kr={k}")
+
+        if len(posts) > 0:
+            last_pid = max(map(lambda p: p.postId, posts))
 
         time.sleep(30)
