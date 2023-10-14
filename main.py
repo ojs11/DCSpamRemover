@@ -1,4 +1,3 @@
-import atexit
 import time
 from datetime import datetime
 from logging import getLogger
@@ -6,14 +5,14 @@ from random import random
 from threading import Event, Thread
 from urllib.parse import urlparse, urlunparse
 
-from selenium.webdriver import Chrome
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 
 import dc
 import ipv4
+import webdriver
 from config import get_config
 from interval import interval_human
+
 
 logger = getLogger()
 
@@ -45,20 +44,7 @@ def log_post(prefix: str, post: dc.DCPostTR):
 
 
 def main_selenium():
-    options = ChromeOptions()
-    options.add_argument("--ignore-certificate-errors")
-    options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
-    options.add_experimental_option('useAutomationExtension', False)
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    if get_config().getboolean('selenium', 'headless', fallback=False):
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--start-maximized")
-        options.add_argument("--headless")
-    options.set_capability("pageLoadStrategy", "none")  # fucking google analytics
-
-    driver = Chrome(options=options)
-    driver.implicitly_wait(10)
-    atexit.register(lambda: driver.close())
+    driver = webdriver.create()
 
     try:
         gall_id = get_config().get('gallery', 'id')

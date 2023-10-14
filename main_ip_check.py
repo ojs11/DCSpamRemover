@@ -11,22 +11,12 @@ import ipv4
 from config import get_config
 from logger import setup_logger
 
+import webdriver
+
 logger = getLogger()
 
 if __name__ == "__main__":
-    options = ChromeOptions()
-    options.add_argument("--ignore-certificate-errors")
-    options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
-    options.add_experimental_option('useAutomationExtension', False)
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    if get_config().getboolean('selenium', 'headless', fallback=False):
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--start-maximized")
-        options.add_argument("--headless")
-    options.set_capability("pageLoadStrategy", "none")  # fucking google analytics
-
-    driver = Chrome(options=options)
-    driver.implicitly_wait(10)
+    driver = webdriver.create()
 
     gall_id = get_config().get('gallery', 'id')
     gall_url = urlparse(f"https://gall.dcinside.com/mgallery/board/lists?id={gall_id}")
