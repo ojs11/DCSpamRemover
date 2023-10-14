@@ -1,6 +1,18 @@
 import csv
+from dataclasses import dataclass
+from functools import lru_cache
 
-_data = None
+_data: list['IPV4'] = None
+
+
+@dataclass
+class IPV4:
+    country: str
+    start_ip: str
+    end_ip: str
+    assign_date: str
+    name_kr: str
+    name_en: str
 
 
 def _get_data():
@@ -8,44 +20,52 @@ def _get_data():
     if _data:
         return _data
 
-    with open('ipv4.csv', 'r', encoding='utf-8') as csv_file:
-        _data = list(csv.reader(csv_file))
+    try:
+        _map = {}
+        _data = []
+        with open("ipv4.csv", "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader)
+            for r in reader:
+                _data.append(IPV4(r[0], r[1], r[2], r[4], r[0], r[0]))
+                _map[r[1]] = r[0]
+    except FileNotFoundError:
+        _data = []
 
-    _data.pop(0)
-    for d in _data:
-        d[1] = ip_to_int(d[1])
-        d[2] = ip_to_int(d[2])
+    try:
+        with open('ipv4-Kr.csv', 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            next(reader)
+            for r in reader:
+                if r[1] in _map:
+                    _data[_map[r[1]]].name_kr = r[0]
+                else:
+                    _data.append(IPV4("KR", r[2], r[3], r[5], r[0], r[1]))
+    except FileNotFoundError:
+        pass
 
     return _data
 
 
-def ip_to_int(ip_address):
-    parts = ip_address.split('.')
-    if len(parts) < 4:
-        parts = parts + ['0'] * (4 - len(parts))
-    ip_int = int(parts[0]) * 256**3 + int(parts[1]) * 256**2 + int(parts[2]) * 256 + int(parts[3])
-    return ip_int
+def ip_to_int(ip):
+    c = ip.count('.')
+    if c < 3:
+        ip += '.0' * (3 - c)
+    return int.from_bytes(map(int, ip.split('.')), 'big')
 
 
-def int_to_ip(ip_int):
-    ip_address = []
-    for _ in range(4):
-        ip_address.append(str(ip_int % 256))
-        ip_int //= 256
-    return '.'.join(ip_address[::-1])
-
-
-def get_ip_country(ip_address):
-    ip_int = ip_to_int(ip_address)
+@lru_cache(maxsize=2048)
+def get_ip_data(ip):
     data = _get_data()
 
+    ip = ip_to_int(ip)
     ret = []
     for d in data:
-        if d[1] <= ip_int <= d[2]:
-            ret.append(d[0])
-    if len(ret) == 0:
-        return "Unknown"
-    elif len(ret) == 1:
-        return ret[0]
-    else:
-        return ret
+        if ip_to_int(d.start_ip) <= ip <= ip_to_int(d.end_ip):
+            # 독립 사용자
+            if d.country == "KR" and d.name_kr == "KR":
+                continue
+
+            ret.append(d)
+
+    return ret

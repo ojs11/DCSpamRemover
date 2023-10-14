@@ -33,6 +33,17 @@ def should_renew_restrict(last_restrict_dt: list[datetime]):
     return False
 
 
+def log_post(prefix: str, post: dc.DCPostTR):
+    ip = ipv4.get_ip_data(post.writer_ip)
+    if len(ip) == 0:
+        logger.info(f"{prefix} pid={post.postId}, title={post.title}, ip={post.writer_ip}, Country=? name_en=? name_kr=?")
+    elif isinstance(ip, list):
+        c = ",".join(set(map(lambda i: i.country, ip)))
+        e = ",".join(set(map(lambda i: i.name_en, ip)))
+        k = ",".join(set(map(lambda i: i.name_kr, ip)))
+        logger.info(f"{prefix} pid={post.postId}, title={post.title}, ip={post.writer_ip}, Country={c} name_en={e} name_kr={k}")
+
+
 def main_selenium():
     options = ChromeOptions()
     options.add_argument("--ignore-certificate-errors")
@@ -190,7 +201,7 @@ def main_selenium():
                     elif da.text == "차단 및 삭제되었습니다.":
                         da.accept()
                         for post in posts:
-                            logger.info(f"삭제 및 {block_hour}시간 차단 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip} 국가={ipv4.get_ip_country(post.writer_ip)}")
+                            log_post(f"삭제 및 {block_hour}시간 차단 성공", post)
                         removals += len(posts)
                     else:
                         logger.warning(f"삭제 및 차단 실패. 예기치 못한 알림 : {da.text}")
@@ -212,7 +223,7 @@ def main_selenium():
                         continue
                     da.accept()
                     for post in posts:
-                        logger.info(f"삭제 성공 : pid={post.postId}, ptype={post.post_type}, title={post.title}, writer={post.writer_name}, ip={post.writer_ip} 국가={ipv4.get_ip_country(post.writer_ip)}")
+                        log_post("삭제 성공", post)
                 except Exception as e:
                     logger.error(f"알림 처리중 예기지 못한 오류 발생 : {e}")
                     continue
