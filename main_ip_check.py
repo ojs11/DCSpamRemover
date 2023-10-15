@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 
 import dc
 import ipv4
+from common import *
 from config import get_config
 from logger import setup_logger
 
@@ -37,14 +38,7 @@ if __name__ == "__main__":
         posts = list(posts)
 
         for p in posts:
-            ip = ipv4.get_ip_data(p.writer_ip)
-            if len(ip) == 0:
-                logger.info(f"pid={p.postId}, title={p.title[:3]}..., ip={p.writer_ip}, Country=? name_en=? name_kr=?")
-            elif isinstance(ip, list):
-                c = ",".join(set(map(lambda i: i.country, ip)))
-                e = ",".join(set(map(lambda i: i.name_en, ip)))
-                k = ",".join(set(map(lambda i: i.name_kr, ip)))
-                logger.info(f"pid={p.postId}, title={p.title[:3]}..., ip={p.writer_ip}, Country={c} name_en={e} name_kr={k}")
+            log_post("IP Check", p)
 
         if len(posts) > 0:
             last_pid = max(map(lambda p: p.postId, posts))
