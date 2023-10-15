@@ -1,7 +1,7 @@
+import logging
+
 import dc
 import ipv4
-
-import logging
 
 logger = logging.getLogger()
 

@@ -13,7 +13,6 @@ from common import *
 from config import get_config
 from interval import interval_human
 
-
 logger = getLogger()
 
 events = {
@@ -215,7 +214,8 @@ def main_selenium():
 
 
 if __name__ == "__main__":
-    from config import watch_config_change, config_file_exists, download_template, create_config
+    from config import (config_file_exists, create_config, download_template,
+                        watch_config_change)
     from logger import setup_logger
     from timedinput import timed_input
     from version import version

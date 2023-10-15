@@ -2,17 +2,13 @@ import time
 from logging import getLogger
 from urllib.parse import urlparse, urlunparse
 
-from selenium.webdriver import Chrome
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 
 import dc
-import ipv4
+import webdriver
 from common import *
 from config import get_config
 from logger import setup_logger
-
-import webdriver
 
 logger = getLogger()
 
