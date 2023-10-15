@@ -226,10 +226,17 @@ def main_selenium():
 
 
 if __name__ == "__main__":
-    from config import watch_config_change
+    from config import watch_config_change, config_file_exists, download_template, create_config
     from logger import setup_logger
     from timedinput import timed_input
     from version import version
+
+    if not config_file_exists():
+        print("config.ini 파일이 없음. 다운로드...")
+        download_template('config.ini')
+        print("config.ini 파일을 수정한 후 다시 실행해주세요.")
+        input("Press Enter to exit...")
+        exit(0)
 
     commands = {
         'reload': lambda: events['reload'].set(),

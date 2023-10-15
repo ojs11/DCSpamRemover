@@ -44,6 +44,10 @@ class Config(ConfigParser):
             return []
         return v.split(",")
 
+    def write(self, path: str):
+        with open(path, 'w', encoding='utf-8') as f:
+            super().write(f)
+
 
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self):
@@ -74,9 +78,26 @@ def get_config():
     return _config
 
 
+def create_config(path):
+    return Config(path)
+
+
 def watch_config_change():
     event_handler = FileChangeHandler()
     observer = Observer()
     observer.schedule(event_handler, path=".", recursive=False)
     observer.start()
     return observer
+
+
+def config_file_exists():
+    return os.path.exists(_config_file_name)
+
+
+def download_template(path):
+    from urllib.request import urlopen
+
+    url = "https://raw.githubusercontent.com/arwls1nzdw/DCSpamRemover/main/config.ini.template"
+    r = urlopen(url)
+    with open(path, 'wb') as f:
+        f.write(r.read())
