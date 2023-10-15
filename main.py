@@ -1,9 +1,13 @@
-from logging import getLogger
-from threading import Thread
+import sys
+sys.path.append('src')
 
-import tasks
-from common import *
-from events import events
+if True:  # noqa
+    from logging import getLogger
+    from threading import Thread
+
+    import tasks
+    from common import *
+    from events import events
 
 logger = getLogger()
 
