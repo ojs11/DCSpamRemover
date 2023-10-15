@@ -71,3 +71,12 @@ def get_ip_data(ip):
             ret.append(d)
 
     return ret
+
+
+if __name__ == "__main__":
+    import sys
+    for ip in sys.argv[1].split(","):
+        print("IP:", ip)
+        for d in get_ip_data(ip):
+            print(d)
+        print("====================================")
