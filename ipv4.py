@@ -61,7 +61,9 @@ def get_ip_data(ip):
     ip = ip_to_int(ip)
     ret = []
     for d in data:
-        if ip_to_int(d.start_ip) <= ip <= ip_to_int(d.end_ip):
+        si = ".".join(d.start_ip.split(".")[:2])
+        ei = ".".join(d.end_ip.split(".")[:2])
+        if ip_to_int(si) <= ip <= ip_to_int(ei):
             # 독립 사용자
             if d.country == "KR" and d.name_kr == "KR":
                 continue
