@@ -13,4 +13,4 @@ config.ini
 *.log
 
 # pyinstaller
-pyinstaller.json
+build
