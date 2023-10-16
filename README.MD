@@ -22,6 +22,14 @@ main.exe 다운로드 후 실행
 생성된 config.ini 수정 후 재실행
 ```
 
+
+## 사용법 - IP 정보 검색
+ipv4.csv, ipv4-KR.csv를 현재 경로에 다운로드 후,
+
+`python .\src\ipv4.py`
+
+`python .\src\ipv4.py 118.235,211.39`
+
 ### Virus 감지되는데요?
 [Refernce](https://nitratine.net/blog/post/issues-when-using-auto-py-to-exe/#my-antivirus-detected-the-exe-as-a-virus)
 

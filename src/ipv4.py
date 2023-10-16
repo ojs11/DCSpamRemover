@@ -75,8 +75,96 @@ def get_ip_data(ip):
 
 if __name__ == "__main__":
     import sys
-    for ip in sys.argv[1].split(","):
-        print("IP:", ip)
-        for d in get_ip_data(ip):
-            print(d)
-        print("====================================")
+
+    if len(sys.argv) > 1:
+        for ip in sys.argv[1].split(","):
+            print("IP:", ip)
+            for d in get_ip_data(ip):
+                print(d)
+            print("====================================")
+    else:
+        import re
+        import sys
+        import tkinter as tk
+        from concurrent.futures import ThreadPoolExecutor
+
+        root = tk.Tk()
+
+        width = 1000
+        height = 400
+        ws = root.winfo_screenwidth()
+        hs = root.winfo_screenheight()
+
+        root.title("IPV4")
+        root.geometry(f"{width}x{height}+{(ws - width) // 2}+{(hs - height) // 2}")
+
+        # input frame
+        frame = tk.Frame(root)
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(frame, text="IP").pack(side=tk.LEFT)
+        ip = tk.StringVar()
+
+        ip_input = tk.Entry(frame, textvariable=ip)
+        ip_input.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        # result listbox frame
+        result_frame = tk.Frame(root)
+        result_frame.pack(fill=tk.BOTH, expand=True)
+
+        scrollbar = tk.Scrollbar(result_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        listbox = tk.Listbox(result_frame, yscrollcommand=scrollbar.set)
+        listbox.pack(fill=tk.BOTH, expand=True)
+
+        scrollbar.config(command=listbox.yview)
+
+        ip_pattern = "\w{1,3}\.\w{1,3}"
+        search_result = []
+        search_thread_pool = ThreadPoolExecutor(max_workers=1)
+
+        def do_search():
+            global search_result
+
+            if not re.match(ip_pattern, ip.get()):
+                return
+
+            search_result = get_ip_data(ip.get())
+            root.event_generate('<<UpdateListbox>>', when='tail')
+
+        def do_search_thread():
+            global search_thread
+
+            if not re.match(ip_pattern, ip.get()):
+                return
+
+            listbox.delete(0, tk.END)
+            listbox.insert(tk.END, "Searching...")
+            search_thread_pool.submit(do_search)
+
+        def update_listbox(_: tk.Event):
+            listbox.delete(0, tk.END)
+
+            if len(search_result) == 0:
+                listbox.insert(tk.END, "Not Found")
+                return
+
+            for d in search_result:
+                listbox.insert(tk.END, d)
+
+        delayed_function_id = None
+
+        def on_key_change(*_):
+            global delayed_function_id
+            if delayed_function_id:
+                root.after_cancel(delayed_function_id)
+            delayed_function_id = root.after(600, do_search_thread)
+
+        root.bind('<<UpdateListbox>>', update_listbox)
+        ip_input.bind("<KeyRelease>", on_key_change)
+        ip_input.bind("<Return>", lambda _: do_search_thread())
+
+        tk.Button(frame, text="Search", command=do_search).pack(side=tk.LEFT)
+
+        root.mainloop()
