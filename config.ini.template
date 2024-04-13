@@ -8,16 +8,16 @@ max_size=10m
 backups=5
 
 [user]
-uid=아이디
-pwd=비밀번호
+uid=matter9109
+pwd=gscaw134
 
 [gallery]
 ; 마갤 id
-id=
+id=개메갓
 ; 삭제할 ip 목록, 콤마로 구분
-ip_blacklist=
+ip_blacklist=python .\src\ipv4.py 14.43
 ; 삭제할 게시글 타입 목록. * = 전부, 자세한건 README.MD 참조 (default=*)
-ptypes_to_remove=*
+ptypes_to_remove=*icon_txt:https://m.dcinside.com/board/football_new8/7477288
 ; 차단 및 삭제. default=true
 block_and_del=true
 ; 차단 시간. no_mercy=True일 경우 무시됨 1 or 6
